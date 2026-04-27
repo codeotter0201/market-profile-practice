@@ -60,11 +60,26 @@ TRADEPOSE_API_KEY=sk_xxx
 ```python
 instruments = tester.list_instruments(symbol="XAUUSD", limit=20)
 
-for inst in instruments.instruments:
-    print(inst)
+print(f"count={instruments.count}, total={instruments.total}")
+for idx, inst in enumerate(instruments.instruments):
+    print(idx, inst.key, inst)
 ```
 
-策略中的 `instrument` 必須使用 server 可辨識的 instrument ID，例如：
+策略中的 `instrument` 必須使用 server 可辨識的 instrument key。建議從查詢回來的 object 讀 `inst.key`，不要手打 `print(inst)` 裡看到的整段 repr。例如可用的 key 會長這樣：
+
+```python
+"PEPPERSTONE:spot:XAUUSD"
+"PEPPERSTONE:spot:NAS100"
+```
+
+就把選定的 key 放進 `StrategyConfig`：
+
+```python
+selected_instrument = instruments.instruments[0]  # 依前一格輸出挑選
+INSTRUMENT = selected_instrument.key
+```
+
+本範例使用：
 
 ```python
 INSTRUMENT = "PEPPERSTONE:spot:XAUUSD"
@@ -80,7 +95,7 @@ Market Profile 的 `tick_size` 會影響 POC / VAH / VAL 計算粒度。XAUUSD �
 - 進場：`open > vah`。
 - 出場：`open < poc`。
 
-`indicators` 內部可以指定不同商品，例如主策略交易 XAUUSD，但某個 indicator 使用 NAS100；後端會依 instrument / freq 自動載入並 join 到計算資料中。
+`indicators` 內部可以指定不同商品，例如主策略交易 `PEPPERSTONE:spot:XAUUSD`，但某個 indicator 使用 `PEPPERSTONE:spot:NAS100`；後端會依 instrument / freq 自動載入並 join 到計算資料中。
 
 `volatility_indicator` 在 trades 分析中用來正規化 MAE / MFE，例如 `mae / ATR`、`mfe / ATR`。本範例使用 ATR。
 
