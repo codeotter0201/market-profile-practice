@@ -17,7 +17,7 @@
 Colab 先安裝 SDK：
 
 ```python
-%pip install -q tradepose-client polars nest-asyncio python-dotenv
+!pip install tradepose-client --ignore-requires-python --quiet
 ```
 
 本機先同步 uv 環境：
