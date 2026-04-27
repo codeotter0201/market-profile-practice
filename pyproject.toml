@@ -6,5 +6,6 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "ipykernel>=7.2.0",
+    "python-dotenv>=1.2.2",
     "tradepose-client==1.8.1",
 ]

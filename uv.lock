@@ -335,12 +335,14 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "ipykernel" },
+    { name = "python-dotenv" },
     { name = "tradepose-client" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "ipykernel", specifier = ">=7.2.0" },
+    { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "tradepose-client", specifier = "==1.8.1" },
 ]
 

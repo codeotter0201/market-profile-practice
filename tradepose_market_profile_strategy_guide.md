@@ -17,10 +17,16 @@
 Colab 先安裝 SDK：
 
 ```python
-%pip install -q tradepose-client polars nest-asyncio
+%pip install -q tradepose-client polars nest-asyncio python-dotenv
 ```
 
-本機 VS Code 使用 `.ipynb` 時，專案已透過 `uv add ipykernel` 加入 notebook kernel 需要的套件。
+本機先同步 uv 環境：
+
+```bash
+uv sync
+```
+
+VS Code 開啟 `.ipynb` 後，選擇這個專案的 `.venv` Python kernel。專案已透過 `uv add ipykernel python-dotenv` 加入 notebook 與 `.env` 載入需要的套件。
 
 建立 tester：
 
@@ -28,15 +34,10 @@ Colab 先安裝 SDK：
 import os
 from getpass import getpass
 
-try:
-    from dotenv import load_dotenv
-except ImportError:
-    load_dotenv = None
-
+from dotenv import load_dotenv
 from tradepose_client import BatchTester
 
-if load_dotenv is not None:
-    load_dotenv()
+load_dotenv()
 
 API_KEY = os.getenv("TRADEPOSE_API_KEY") or getpass("TradePose API key: ")
 SERVER_URL = os.getenv("TRADEPOSE_SERVER_URL", "https://api.tradepose.com")
@@ -76,8 +77,10 @@ Market Profile 的 `tick_size` 會影響 POC / VAH / VAL 計算粒度。XAUUSD �
 如果目標只是下載 OHLCV 並看 Market Profile，策略邏輯不用寫得很複雜。本範例只做：
 
 - 指標：Daily Market Profile、Initial Balance Market Profile、ATR。
-- 進場：每天 UTC 15:00。
-- 出場：每天 UTC 22:00。
+- 進場：`open > vah`。
+- 出場：`open < poc`。
+
+`indicators` 內部可以指定不同商品，例如主策略交易 XAUUSD，但某個 indicator 使用 NAS100；後端會依 instrument / freq 自動載入並 join 到計算資料中。
 
 `volatility_indicator` 在 trades 分析中用來正規化 MAE / MFE，例如 `mae / ATR`、`mfe / ATR`。本範例使用 ATR。
 
@@ -88,8 +91,6 @@ strategy = SimpleMarketProfileParams(
     instrument="PEPPERSTONE:spot:XAUUSD",
     base_freq=Freq.MIN_15,
     trade_direction=TradeDirection.LONG,
-    entry_hour=15,
-    exit_hour=22,
     tick_size=1.0,
     atr_freq=Freq.HOUR_1,
     atr_period=120,
